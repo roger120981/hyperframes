@@ -12,6 +12,7 @@ import type {
 } from "./domEditingTypes";
 import {
   buildStableSelector,
+  findClosestByAttribute,
   getCuratedComputedStyles,
   getDataAttributes,
   getInlineStyles,
@@ -318,6 +319,7 @@ export function resolveDomEditSelection(
       compositionPath,
       compositionSrc,
       isCompositionHost: Boolean(compositionSrc),
+      isInsideLockedComposition: Boolean(findClosestByAttribute(current, ["data-timeline-locked"])),
       label: buildElementLabel(current),
       tagName: current.tagName.toLowerCase(),
       boundingBox: {
@@ -488,7 +490,11 @@ export function getDomEditTargetKey(
 }
 
 export function isTextEditableSelection(selection: DomEditSelection): boolean {
-  return selection.textFields.length > 0 && !selection.isCompositionHost;
+  return (
+    selection.textFields.length > 0 &&
+    !selection.isCompositionHost &&
+    !selection.isInsideLockedComposition
+  );
 }
 
 // buildElementAgentPrompt is in domEditingAgentPrompt.ts
